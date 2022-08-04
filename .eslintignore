@@ -11,3 +11,5 @@ node_modules
 .local
 /bin
 Dockerfile
+/dist
+dist
