@@ -45,7 +45,7 @@ export default defineConfig({
     },
     // 打包后目录
     build: {
-        base: process.env.NODE_ENV === 'production' ? '/camera-watermark/' : '',
+        // base: process.env.NODE_ENV === 'production' ? '/camera-watermark/' : '',
         outDir: 'dist',
         assetsDir: 'assets',
         rollupOptions: {
