@@ -29,7 +29,7 @@ export default defineConfig({
             }
         }
     },
-    // 服务
+    // 服务配置
     server: {
         host: '172.17.128.187',
         port: 8080,
@@ -43,9 +43,9 @@ export default defineConfig({
             // }
         }
     },
+    base: process.env.NODE_ENV === 'production' ? '/camera-watermark/' : '/',
     // 打包后目录
     build: {
-        // base: process.env.NODE_ENV === 'production' ? '/camera-watermark/' : '',
         outDir: 'dist',
         assetsDir: 'assets',
         rollupOptions: {

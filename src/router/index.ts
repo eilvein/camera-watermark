@@ -31,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(''),
+    history: createWebHistory('/camera-watermark/'),
     // history: createWebHashHistory(),
     routes,
     scrollBehavior(to, from, savedPosition) {
