@@ -27,31 +27,61 @@
                     />
                 </div>
                 <div class="watermart-preview">
-                    <div class="phone-info">
-                        <h4>
-                            {{ tags.Make.toUpperCase() }}
-                        </h4>
-                        <p>{{ tags.Author }}</p>
-                    </div>
-                    <dl>
+                    <template v-if="style === 'default'">
+                        <div class="phone-info">
+                            <h4>
+                                {{ tags.Make.toUpperCase() }}
+                            </h4>
+                            <p>{{ tags.Author }}</p>
+                        </div>
+                        <dl>
+                            <dt class="photo-logo">
+                                <img
+                                    :src="
+                                        readAssetsFile(currLogo.src) || readAssetsFile(currType.src)
+                                    "
+                                />
+                            </dt>
+                            <dd class="photo-info">
+                                <h4
+                                    >{{ `${tags.FocalLength || 120}mm `
+                                    }}{{ `f/${tags.FNumber || 4.1}` }}
+                                    {{
+                                        `1/${
+                                            Math.round(Math.pow(2, tags.ShutterSpeedValue)) || 100
+                                        }`
+                                    }}
+                                    {{ `ISO${tags.ISOSpeedRatings || 90}` }}</h4
+                                >
+                                <p>
+                                    {{
+                                        formatImgDate(tags.DateTimeOriginal) ||
+                                        formatDate(new Date().getTime(), 'YYYY.MM.DD HH:mm:ss')
+                                    }}
+                                </p>
+                            </dd>
+                        </dl>
+                    </template>
+                    <dl v-else class="photo-center">
                         <dt class="photo-logo">
                             <img
                                 :src="readAssetsFile(currLogo.src) || readAssetsFile(currType.src)"
                             />
                         </dt>
                         <dd class="photo-info">
-                            <h4
-                                >{{ `${tags.FocalLength || 120}mm `
+                            <h4>
+                                {{ tags.Make.toUpperCase() }} {{ `${tags.FocalLength || 120}mm `
                                 }}{{ `f/${tags.FNumber || 4.1}` }}
                                 {{ `1/${Math.round(Math.pow(2, tags.ShutterSpeedValue)) || 100}` }}
-                                {{ `ISO${tags.ISOSpeedRatings || 90}` }}</h4
-                            >
+                                {{ `ISO${tags.ISOSpeedRatings || 90}` }}
+                            </h4>
                             <p>
                                 {{
                                     formatImgDate(tags.DateTimeOriginal) ||
                                     formatDate(new Date().getTime(), 'YYYY.MM.DD HH:mm:ss')
                                 }}
-                            </p>
+                                {{ tags.Author }}</p
+                            >
                         </dd>
                     </dl>
                 </div>
@@ -105,9 +135,33 @@
                     </div>
                 </nut-cell>
                 <nut-cell>
+                    <span class="cell-title"><label>清晰度：</label></span>
+                    <div class="cell-content">
+                        <nut-radiogroup v-model="high" direction="horizontal">
+                            <nut-radio icon-size="12" :label="0">默认</nut-radio>
+                            <nut-radio icon-size="12" :label="1">香</nut-radio>
+                            <nut-radio icon-size="12" :label="2">更香</nut-radio>
+                            <nut-radio icon-size="12" :label="3">浓香</nut-radio>
+                        </nut-radiogroup>
+                    </div>
+                </nut-cell>
+                <nut-cell>
+                    <span class="cell-title"><label>居中：</label></span>
+                    <div class="cell-content">
+                        <nut-radiogroup v-model="style" direction="horizontal">
+                            <nut-radio icon-size="12" label="default">默认</nut-radio>
+                            <nut-radio icon-size="12" label="center">居中</nut-radio>
+                        </nut-radiogroup>
+                    </div>
+                </nut-cell>
+                <nut-cell>
                     <span class="cell-title"><label>摄影师：</label></span>
                     <div class="cell-content">
-                        <input class="cell-input" placeholder="请输入" v-model="tags.Author" />
+                        <input
+                            class="cell-input"
+                            placeholder="请输入摄影师"
+                            v-model="tags.Author"
+                        />
                     </div>
                 </nut-cell>
                 <nut-cell class="cell-center">
@@ -177,55 +231,57 @@
                 currFile: {} as any,
                 imgUrl: '',
                 watermarkImg: '',
+                high: 0,
+                style: 'default',
                 tags: {
                     Make: 'XIAOMI 12S ULTRA',
-                    Author: 'Eilvein'
+                    Author: ''
                 } as any
             })
             const typeItems = [
                 {
                     name: '小米',
-                    value: 'XIAOMI',
+                    value: 'XIAOMI 12S ULTRA',
                     src: 'xiaomi.png'
                 },
                 {
                     name: '华为',
-                    value: 'HUAWEI',
+                    value: 'HUAWEI P50',
                     src: 'huawei.png'
                 },
                 {
                     name: 'Oppo',
-                    value: 'OPPO',
+                    value: 'OPPO FINF X5 PRO',
                     src: 'oppo.png'
                 },
                 {
                     name: 'Vivo',
-                    value: 'VIVO',
+                    value: 'VIVO X80 PRO',
                     src: 'vivo.png'
                 },
                 {
                     name: '魅族',
-                    value: 'MEIZU',
+                    value: 'MEIZU 18S PRO',
                     src: 'meizu.png'
                 },
                 {
                     name: '真我',
-                    value: 'REALME',
+                    value: 'REALME GT2',
                     src: 'realme.png'
                 },
                 {
                     name: '苹果',
-                    value: 'APPLE',
+                    value: 'IPHONE 13 PRO MAX',
                     src: 'apple.png'
                 },
                 {
                     name: '三星',
-                    value: 'SAMSUNG',
+                    value: 'Galaxy S22 Ultra',
                     src: 'samsung.png'
                 },
                 {
                     name: '索尼',
-                    value: 'SONY',
+                    value: 'SONY Xperia 1 IV',
                     src: 'sony.png'
                 }
             ]
@@ -340,7 +396,7 @@
                 let el = photoRef.value
                 let width = el.offsetWidth
                 let height = el.offsetHeight
-                let scale = DPR()
+                let scale = DPR() + Number(state.high)
                 let canvas = document.createElement('canvas') as any
                 const img = new Image()
                 img.src = state.imgUrl
@@ -539,6 +595,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            &.photo-center {
+                width: 100%;
+            }
             dt {
                 display: inline-flex;
                 justify-content: center;

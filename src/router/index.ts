@@ -18,11 +18,10 @@ const routes: Array<RouteRecordRaw> = [
         path: '/',
         name: 'Index',
         component: Index,
-        redirect: '/home',
         children: [
             {
-                path: 'home',
-                name: 'Home',
+                path: '',
+                name: 'Camera',
                 component: Home,
                 meta: { title: '照片水印生产器', requireLogin: false, isAdmin: true }
             }

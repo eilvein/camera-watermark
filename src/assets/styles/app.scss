@@ -12,6 +12,7 @@ html,
     height: 100%;
     background: #fbfbfb;
     min-height: 100vh;
+    overflow: hidden;
 }
 
 #app {
@@ -19,6 +20,7 @@ html,
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: $txt-default;
+    overflow-y: auto;
 }
 html {
     @include root-font-size();
