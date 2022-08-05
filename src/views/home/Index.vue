@@ -26,6 +26,9 @@
                         @change="uploadImgChange"
                     />
                 </div>
+                <!-- <div ref="imageRef">
+                    <img src="" alt="" />
+                </div> -->
                 <div class="watermart-preview">
                     <template v-if="style === 'default'">
                         <div class="phone-info">
@@ -211,6 +214,7 @@
             const { proxy }: any = getCurrentInstance()
             const uploadRef = ref<any>(null)
             const photoRef = ref<any>(null)
+            const imageRef = ref<any>(null)
             const isExif = ref(-1)
             const state = reactive({
                 settingVisible: false,
@@ -456,9 +460,10 @@
                 typeItems,
                 uploadRef,
                 photoRef,
+                imageRef,
+                logoItems,
                 warningNotify,
                 chooseType,
-                logoItems,
                 chooseLogo,
                 typeActionSheet,
                 logoActionSheet,
