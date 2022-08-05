@@ -1,0 +1,1 @@
+import{d as e,f as r,e as n,c as o}from"./vendor-b42e8619.js";var s=e({name:"Index",components:{},setup:()=>{}});s.render=function(e,s,t,a,d,u){const c=r("router-view");return n(),o(c)};export{s as default};
