@@ -1,6 +1,5 @@
 <template>
     <div class="home-container">
-        <!-- <header> <h2>AI照片水印生产</h2></header> -->
         <div class="photo-main">
             <div :class="['photo-box', `box-${theme}`]" ref="photoRef">
                 <div class="photo-upload">
