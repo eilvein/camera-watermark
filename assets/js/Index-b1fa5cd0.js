@@ -1,0 +1,1 @@
+import{d as s,a,u as o,e as n,s as r,b as e}from"./vendor-fa5d64d8.js";var t=s({setup:()=>{a((()=>{const s=o();console.log(s.params)}))}});const d={class:"box-404"},l=[e("h1",null,"404 not find",-1)];t.render=function(s,a,o,e,t,u){return n(),r("div",d,l)};export{t as default};
