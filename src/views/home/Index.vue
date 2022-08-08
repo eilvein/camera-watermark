@@ -7,7 +7,7 @@
                         <nut-icon name="photograph" size="38"></nut-icon>
                     </div>
                     <div class="preview-photo" v-else>
-                        <img :src="imgUrl" />
+                        <img :class="currFilter" :src="imgUrl" />
                         <a
                             class="upload-close"
                             href="javascript:void(0);"
@@ -25,9 +25,6 @@
                         @change="uploadImgChange"
                     />
                 </div>
-                <!-- <div ref="imageRef">
-                    <img src="" alt="" />
-                </div> -->
                 <div class="watermart-preview">
                     <template v-if="style === 'default'">
                         <div class="phone-info">
@@ -93,7 +90,7 @@
             <ul>
                 <!-- <li @click="handlerRefreshUpload"><nut-icon name="refresh"></nut-icon>上传</li> -->
                 <li @click="handlerOpenSetting"> <nut-icon name="setting"></nut-icon>配置</li>
-                <li> <nut-icon name="photograph"></nut-icon>滤镜</li>
+                <li @click="handleOpenFilters"> <nut-icon name="photograph"></nut-icon>滤镜</li>
 
                 <li @click="warningNotify('仅供学习参考，如有侵权请联系删除。')">
                     <nut-icon name="tips"></nut-icon>声明</li
@@ -101,6 +98,31 @@
                 <li @click="handlerBuildImg"> <nut-icon name="download"></nut-icon>生成</li>
             </ul>
         </footer>
+        <nut-popup
+            position="bottom"
+            :style="{ height: '25%' }"
+            v-model:visible="filterVisible"
+            :overlay="false"
+            closeable
+            style="background-color: #f1f1f1"
+        >
+            <a @click="handleCancelFliter" class="filter-del" href="javascript:void(0)"
+                ><nut-icon name="del" color="#969799"></nut-icon
+            ></a>
+            <div class="filters-box">
+                <ul>
+                    <li
+                        v-for="(item, index) in filtersList"
+                        :key="index"
+                        @click="handleCheckedFilter(item.value, index)"
+                        :class="{ 'active-filter': currFilterIdx === index }"
+                    >
+                        <img :class="item.value" src="@/assets/images/filters_demo.jpg" />
+                        <p>{{ item.name }}</p>
+                    </li>
+                </ul>
+            </div>
+        </nut-popup>
         <nut-popup position="top" :style="{ height: '100%' }" v-model:visible="settingVisible">
             <nut-cell-group title="水印设置" desc="请选择自己喜欢风格配置">
                 <nut-cell>
@@ -179,7 +201,12 @@
                 </nut-cell>
             </nut-cell-group>
         </nut-popup>
-        <nut-popup position="bottom" :style="{ height: '90%' }" v-model:visible="showTop" closeable>
+        <nut-popup
+            position="bottom"
+            :style="{ height: '90%' }"
+            v-model:visible="watermarkVisible"
+            closeable
+        >
             <div class="watermark-img">
                 <h3>长按保存照片</h3>
                 <img :src="watermarkImg" />
@@ -206,6 +233,7 @@
     import html2canvas from 'html2canvas'
     import { defineComponent, reactive, getCurrentInstance, ref, toRefs, onMounted } from 'vue'
     import { getAssetsFile, DPR, formatDate } from '@/utils/tools'
+    // import * as htmlToImage from 'html-to-image'
 
     export default defineComponent({
         name: 'Home',
@@ -217,9 +245,10 @@
             const isExif = ref(-1)
             const state = reactive({
                 settingVisible: false,
+                filterVisible: false,
                 typeVisible: false,
                 logoVisible: false,
-                showTop: false,
+                watermarkVisible: false,
                 logoValue: 'leica',
                 theme: 'white',
                 currType: {
@@ -239,7 +268,9 @@
                 tags: {
                     Make: 'XIAOMI 12S ULTRA',
                     Author: ''
-                } as any
+                } as any,
+                currFilterIdx: null as any,
+                currFilter: ''
             })
             const typeItems = [
                 {
@@ -249,7 +280,7 @@
                 },
                 {
                     name: '华为',
-                    value: 'HUAWEI P50',
+                    value: 'HUAWEI P50 PRO',
                     src: 'huawei.png'
                 },
                 {
@@ -320,6 +351,168 @@
                     src: ''
                 }
             ]
+            const filtersList = [
+                {
+                    name: '1977',
+                    value: 'filter-1977'
+                },
+                {
+                    name: 'Aden',
+                    value: 'filter-aden'
+                },
+                {
+                    name: 'Amaro',
+                    value: 'filter-amaro'
+                },
+                {
+                    name: 'Ashby',
+                    value: 'filter-ashby'
+                },
+                {
+                    name: 'Brannan',
+                    value: 'filter-brannan'
+                },
+                {
+                    name: 'Brooklyn',
+                    value: 'filter-brooklyn'
+                },
+                {
+                    name: 'Charmes',
+                    value: 'filter-charmes'
+                },
+                {
+                    name: 'Clarendon',
+                    value: 'filter-clarendon'
+                },
+                {
+                    name: 'Crema',
+                    value: 'filter-crema'
+                },
+                {
+                    name: 'Dogpatch',
+                    value: 'filter-dogpatch'
+                },
+                {
+                    name: 'Earlybird',
+                    value: 'filter-earlybird'
+                },
+                {
+                    name: 'Gingham',
+                    value: 'filter-gingham'
+                },
+                {
+                    name: 'Ginza',
+                    value: 'filter-ginza'
+                },
+                {
+                    name: 'Hefe',
+                    value: 'filter-hefe'
+                },
+                {
+                    name: 'Helena',
+                    value: 'filter-helena'
+                },
+                {
+                    name: 'Hudson',
+                    value: 'filter-hudson'
+                },
+                {
+                    name: 'Inkwell',
+                    value: 'filter-inkwell'
+                },
+                {
+                    name: 'Kelvin',
+                    value: 'filter-kelvin'
+                },
+                {
+                    name: 'Kuno',
+                    value: 'filter-kuno'
+                },
+                {
+                    name: 'Lark',
+                    value: 'filter-lark'
+                },
+                {
+                    name: 'Lo-Fi',
+                    value: 'filter-lofi'
+                },
+                {
+                    name: 'Ludwig',
+                    value: 'filter-ludwig'
+                },
+                {
+                    name: 'Maven',
+                    value: 'filter-maven'
+                },
+                {
+                    name: 'Mayfair',
+                    value: 'filter-mayfair'
+                },
+                {
+                    name: 'Moon',
+                    value: 'filter-moon'
+                },
+                {
+                    name: 'Nashville',
+                    value: 'filter-nashville'
+                },
+                {
+                    name: 'Perpetua',
+                    value: 'filter-perpetua'
+                },
+                {
+                    name: 'Poprocket',
+                    value: 'filter-poprocket'
+                },
+                {
+                    name: 'Reyes',
+                    value: 'filter-reyes'
+                },
+                {
+                    name: 'Rise',
+                    value: 'filter-rise'
+                },
+                {
+                    name: 'Sierra',
+                    value: 'filter-sierra'
+                },
+                {
+                    name: 'Skyline',
+                    value: 'filter-skyline'
+                },
+                {
+                    name: 'Stinson',
+                    value: 'filter-stinson'
+                },
+                {
+                    name: 'Sutro',
+                    value: 'filter-sutro'
+                },
+                {
+                    name: 'Toaster',
+                    value: 'filter-toaster'
+                },
+                {
+                    name: 'Valencia',
+                    value: 'filter-valencia'
+                },
+                {
+                    name: 'Vesper',
+                    value: 'filter-vesper'
+                },
+                {
+                    name: 'Walden',
+                    value: 'filter-walden'
+                },
+                {
+                    name: 'Willow',
+                    value: 'filter-willow'
+                },
+                {
+                    name: 'X-Pro II',
+                    value: 'filter-xpro-ii'
+                }
+            ]
             const typeActionSheet = (param: boolean) => {
                 state.typeVisible = !state.typeVisible
             }
@@ -355,6 +548,8 @@
                 state.tags.FocalLength = 0
                 state.tags.DateTimeOriginal = null
                 state.tags.ShutterSpeedValue = 0
+                state.currFilter = ''
+                state.currFilterIdx = null
             }
             const handleUpload = () => {
                 uploadRef.value.click()
@@ -425,10 +620,19 @@
                     useCORS: true,
                     dpi: 300
                 }
-                state.showTop = true
+                state.watermarkVisible = true
                 html2canvas(el, opts).then((canvas) => {
                     state.watermarkImg = canvas.toDataURL()
                 })
+
+                // htmlToImage
+                //     .toPng(el)
+                //     .then(function (dataUrl) {
+                //         state.watermarkImg = dataUrl
+                //     })
+                //     .catch(function (error) {
+                //         console.error('oops, something went wrong!', error)
+                //     })
             }
             const handlerRefreshUpload = () => {
                 uploadRef.value.clearUploadQueue()
@@ -451,7 +655,18 @@
                 })
                 return date.join(' ')
             }
-
+            const handleOpenFilters = () => {
+                proxy.$notify.primary('暂不支持！')
+                state.filterVisible = true
+            }
+            const handleCancelFliter = () => {
+                state.currFilterIdx = null
+            }
+            const handleCheckedFilter = (v: string, i: number) => {
+                console.log(v)
+                state.currFilterIdx = i
+                state.currFilter = v
+            }
             onMounted(() => {})
 
             return {
@@ -461,6 +676,7 @@
                 photoRef,
                 imageRef,
                 logoItems,
+                filtersList,
                 warningNotify,
                 chooseType,
                 chooseLogo,
@@ -475,7 +691,10 @@
                 formatImgDate,
                 formatDate,
                 handleUpload,
-                handleDelete
+                handleDelete,
+                handleCheckedFilter,
+                handleOpenFilters,
+                handleCancelFliter
             }
         }
     })
@@ -488,6 +707,8 @@
         @include font-size(28);
         display: flex;
         flex-direction: column;
+        max-width: px2rem(750);
+        margin: 0 auto;
     }
     header {
         background-color: #fff;
@@ -520,7 +741,7 @@
         }
     }
     .photo-main {
-        width: 100vw;
+        width: 100%;
         display: flex;
         flex: 1;
         justify-content: center;
@@ -686,6 +907,56 @@
         &__close-icon--top-right {
             top: 0;
             right: px2rem(10);
+        }
+    }
+    .filter-del {
+        position: absolute;
+        line-height: 0;
+        left: px2rem(20);
+        top: px2rem(5);
+        padding: px2rem(10);
+        z-index: 9;
+    }
+    .filters-box {
+        width: 100%;
+        padding-top: px2rem(90);
+        overflow: hidden;
+        overflow-x: scroll;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        ul {
+            width: px2rem(165 * 40 + 30);
+            li {
+                display: inline-block;
+                position: relative;
+                width: px2rem(150);
+                height: px2rem(150);
+                margin-left: px2rem(15);
+                background-color: rgb(238, 238, 238);
+                border-radius: px2rem(12);
+                overflow: hidden;
+                border: 2px solid transparent;
+                transition: 0.2s ease-out;
+                padding: px2rem(1);
+
+                & > img {
+                    border-radius: px2rem(10);
+                }
+                &.active-filter,
+                &:hover {
+                    border-color: #ff851b;
+                }
+                & > p {
+                    color: rgb(255, 255, 255);
+                    @include font-size(24);
+                    position: absolute;
+                    bottom: px2rem(15);
+                    left: 0;
+                    width: 100%;
+                    text-align: center;
+                }
+            }
         }
     }
 </style>
